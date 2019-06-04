@@ -29,22 +29,10 @@ export class UserController {
 
   constructor(
     @repository(UserRepository)
-    public userRepository: UserRepository,
+    public userRepository: UserRepository
   ) { }
 
-  @post('/users', {
-    responses: {
-      '200': {
-        description: 'User model instance',
-        content: { 'application/json': { schema: { 'x-ts-type': User } } },
-      },
-    },
-  })
-  async create(@requestBody() user: User): Promise<User> {
-    return await this.userRepository.create(user);
-  }
-
-  @post('/login', {
+  @post('/users/authentication', {
     responses: {
       '200': {
         description: 'a session id',
@@ -71,7 +59,7 @@ export class UserController {
     });
   }
 
-  @post('/register', {
+  @post('/users', {
     responses: {
       '200': {
         description: 'User model instance',

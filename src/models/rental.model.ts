@@ -1,11 +1,10 @@
-import {Entity, model, property} from '@loopback/repository';
+import { Entity, model, property } from '@loopback/repository';
 
-@model({settings: {strict: false}})
+@model({ settings: { strict: false } })
 export class Rental extends Entity {
   @property({
     type: 'number',
-    id: true,
-    required: true,
+    id: true
   })
   id: number;
 

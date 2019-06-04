@@ -1,10 +1,20 @@
 {
   "ids": {
-    "User": 2
+    "User": 3,
+    "Rental": 3,
+    "Trip": 2
   },
   "models": {
     "User": {
-      "1": "{\"id\":1,\"firstName\":\"Jacob\",\"lastName\":\"Begemann\",\"email\":\"email@example.com\",\"phone\":\"1234567890\",\"username\":\"jacob\",\"password\":\"pw\",\"location\":\"Earth\"}"
+      "1": "{\"firstName\":\"Jacob\",\"lastName\":\"Begemann\",\"email\":\"email@example.con\",\"phone\":\"1234567890\",\"username\":\"jacob42_42\",\"password\":\"pw\",\"location\":\"Earth\",\"id\":1}",
+      "2": "{\"firstName\":\"Jane\",\"lastName\":\"Doe\",\"email\":\"jane@example.com\",\"phone\":\"1234565432\",\"username\":\"jane\",\"password\":\"pw\",\"location\":\"Earth\",\"id\":2}"
+    },
+    "Rental": {
+      "1": "{\"name\":\"A nice house in suburban ma\",\"location\":\"Earth\",\"pictureSources\":[\"https://i.pinimg.com/originals/ec/a2/be/eca2be6de4453fae0b12f0478401a329.jpg\"],\"hostID\":0,\"price\":\"$56/night\",\"id\":1}",
+      "2": "{\"name\":\"An apartment in Cape Town\",\"location\":\"Cape Town SA\",\"pictureSources\":[\"https://lonelyplanetimages.imgix.net/mastheads/stock-photo-welcome-to-cape-town-104168527.jpg?sharp=10&vib=20&w=1200\"],\"hostID\":1,\"price\":\"$100/night\",\"id\":2}"
+    },
+    "Trip": {
+      "1": "{\"rentalID\":1,\"userID\":1,\"dateFrom\":\"3/5\",\"dateTo\":\"3/10\",\"id\":1}"
     }
   }
 }
