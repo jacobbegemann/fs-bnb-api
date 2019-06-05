@@ -1,13 +1,14 @@
 {
   "ids": {
-    "User": 3,
+    "User": 4,
     "Rental": 3,
     "Trip": 2
   },
   "models": {
     "User": {
       "1": "{\"firstName\":\"Jacob\",\"lastName\":\"Begemann\",\"email\":\"email@example.con\",\"phone\":\"1234567890\",\"username\":\"jacob42_42\",\"password\":\"pw\",\"location\":\"Earth\",\"id\":1}",
-      "2": "{\"firstName\":\"Jane\",\"lastName\":\"Doe\",\"email\":\"jane@example.com\",\"phone\":\"1234565432\",\"username\":\"jane\",\"password\":\"pw\",\"location\":\"Earth\",\"id\":2}"
+      "2": "{\"firstName\":\"Jane\",\"lastName\":\"Doe\",\"email\":\"jane@example.com\",\"phone\":\"1234565432\",\"username\":\"jane\",\"password\":\"pw\",\"location\":\"Earth\",\"id\":2}",
+      "3": "{\"firstName\":\"Kayla\",\"lastName\":\"Johnson\",\"email\":\"kayla@nothing.com\",\"phone\":\"1234567899\",\"username\":\"kayla\",\"password\":\"pw\",\"location\":\"Earth\",\"id\":3}"
     },
     "Rental": {
       "1": "{\"name\":\"A nice house in suburban ma\",\"location\":\"Earth\",\"pictureSources\":[\"https://i.pinimg.com/originals/ec/a2/be/eca2be6de4453fae0b12f0478401a329.jpg\"],\"hostID\":0,\"price\":\"$56/night\",\"id\":1}",

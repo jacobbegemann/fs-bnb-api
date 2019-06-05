@@ -21,23 +21,28 @@ export class Rental extends Entity {
   location: string;
 
   @property({
-    type: 'array',
-    itemType: 'string',
+    type: 'string',
     required: true,
+    mysql: {
+      columnName: "picture_sources"
+    }
   })
-  pictureSources: string[];
+  pictureSources: string;
+
+  @property({
+    type: 'number',
+    required: true,
+    mysql: {
+      columnName: "host_id"
+    }
+  })
+  hostID: number;
 
   @property({
     type: 'number',
     required: true,
   })
-  hostID: number;
-
-  @property({
-    type: 'string',
-    required: true,
-  })
-  price: string;
+  price: number;
 
   // Define well-known properties here
 

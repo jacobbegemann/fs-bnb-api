@@ -74,6 +74,7 @@ export class RentalController {
   })
   async bookById(@requestBody() trip: Trip, @param.path.number('id') id: number): Promise<Trip> {
     trip.rentalID = id;
+    trip.status = "NEW";
     return await this.tripRepository.create(trip);
   }
 

@@ -54,7 +54,7 @@ export class UserController {
       if (value.length) {
         return this.getRandomInt(this.max) * value[0].getId();
       } else {
-        return 0;
+        throw new HttpErrors.NotFound;
       }
     });
   }

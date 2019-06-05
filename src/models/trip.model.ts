@@ -4,6 +4,9 @@ import { Entity, model, property } from '@loopback/repository';
 export class Trip extends Entity {
   @property({
     type: 'number',
+    mysql: {
+      columnName: 'rental_id'
+    }
   })
   rentalID: number;
 
@@ -16,20 +19,34 @@ export class Trip extends Entity {
   @property({
     type: 'number',
     required: true,
+    mysql: {
+      columnName: 'user_id'
+    }
   })
   userID: number;
 
   @property({
     type: 'string',
     required: true,
+    mysql: {
+      columnName: 'date_from'
+    }
   })
   dateFrom: string;
 
   @property({
     type: 'string',
     required: true,
+    mysql: {
+      columnName: 'date_to'
+    }
   })
   dateTo: string;
+
+  @property({
+    type: 'string',
+  })
+  status: string;
 
   // Define well-known properties here
 

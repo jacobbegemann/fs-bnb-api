@@ -10,11 +10,17 @@ export class User extends Entity {
 
   @property({
     type: 'string',
+    mysql: {
+      columnName: "first_name"
+    }
   })
   firstName?: string;
 
   @property({
     type: 'string',
+    mysql: {
+      columnName: "last_name"
+    }
   })
   lastName?: string;
 
