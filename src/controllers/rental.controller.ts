@@ -105,8 +105,8 @@ export class RentalController {
     },
   })
   async findByHostId(@param.path.number('hostID') hostID: number): Promise<Rental[]> {
-    const hostIdWhere: Where = (new WhereBuilder()).eq("hostID", hostID);
-    const filter: Filter<Rental> = (new FilterBuilder<Rental>()).where(hostIdWhere).build();
+    const filter: Filter<Rental> = new FilterBuilder<Rental>().build();
+    filter.where = { hostID: hostID };
     const foundRental: Rental[] = await this.rentalRepository.find(filter);
     const fs = require("fs");
     for (let i = 0; i < foundRental.length; i++) {
