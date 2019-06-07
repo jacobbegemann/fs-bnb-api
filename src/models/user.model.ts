@@ -38,11 +38,6 @@ export class User extends Entity {
   @property({
     type: 'string',
   })
-  username?: string;
-
-  @property({
-    type: 'string',
-  })
   password?: string;
 
   @property({
@@ -50,6 +45,54 @@ export class User extends Entity {
   })
   location?: string;
 
+  @property({
+    type: 'string',
+  })
+  birthday?: string;
+
+  @property({
+    type: 'string',
+    mysql: {
+      columnName: 'num_bookings'
+    }
+  })
+  numBookings?: string;
+
+  @property({
+    type: 'string',
+  })
+  reviews?: string;
+
+  @property({
+    type: 'string',
+  })
+  bookings?: string;
+
+  @property({
+    type: 'string',
+  })
+  saved?: string;
+
+  @property({
+    type: 'string',
+  })
+  messages?: string;
+
+  @property({
+    type: 'string',
+    mysql: {
+      columnName: 'photo_source'
+    }
+  })
+  photoSource?: string;
+
+  @property({
+    type: 'string',
+    mysql: {
+      columnName: 'year_joined'
+    }
+  })
+  yearJoined?: number;
 
   constructor(data?: Partial<User>) {
     super(data);

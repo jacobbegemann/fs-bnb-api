@@ -22,10 +22,10 @@ import {
 import { User } from '../models';
 import { UserRepository } from '../repositories';
 import bodyParser = require('body-parser');
+import { Utility } from '../utility';
+import { request } from 'http';
 
 export class UserController {
-
-  private max: number = 1000000;
 
   constructor(
     @repository(UserRepository)
@@ -42,7 +42,7 @@ export class UserController {
   })
   async login(
     @requestBody() user: User,
-  ): Promise<number> {
+  ): Promise<string> {
     return await this.userRepository.find(
       (new FilterBuilder<User>())
         .where((new WhereBuilder())
@@ -52,7 +52,11 @@ export class UserController {
         .build()
     ).then((value) => {
       if (value.length) {
-        return this.getRandomInt(this.max) * value[0].getId();
+        const obj = {
+          token: this.generateJWT(value[0].getId()),
+          id: value[0].getId()
+        };
+        return JSON.stringify(obj);
       } else {
         throw new HttpErrors.NotFound;
       }
@@ -69,22 +73,19 @@ export class UserController {
   })
   async register(
     @requestBody() user: User,
-  ): Promise<User> {
+  ): Promise<string> {
     const emailWhere: Where = (new WhereBuilder<User>()).eq("email", user.email).build();
-    const usernameWhere: Where = (new WhereBuilder<User>()).eq("username", user.username).build();
-    return await this.userRepository.find(
-      (new FilterBuilder<User>())
-        .where((new WhereBuilder<User>())
-          .or(emailWhere, usernameWhere)
-          .build())
-        .build())
-      .then((value) => {
-        if (value.length) {
-          throw new HttpErrors.Conflict;
-        } else {
-          return this.userRepository.create(user);
-        }
-      });
+    const filter: Filter<User> = (new FilterBuilder<User>())
+      .where(emailWhere)
+      .build();
+    return await this.userRepository.find(filter).then((value: User[]) => {
+      if (value.length) {
+        throw new HttpErrors.Conflict;
+      } else {
+        user.yearJoined = (new Date()).getFullYear();
+        return this.userRepository.create(user).then((newUser: User) => this.login(newUser));
+      }
+    });
   }
 
   @get('/users/count', {
@@ -116,7 +117,8 @@ export class UserController {
   async find(
     @param.query.object('filter', getFilterSchemaFor(User)) filter?: Filter<User>,
   ): Promise<User[]> {
-    return await this.userRepository.find(filter);
+    // return await this.userRepository.find(filter);
+    return [];
   }
 
   @patch('/users', {
@@ -138,12 +140,42 @@ export class UserController {
     responses: {
       '200': {
         description: 'User model instance',
-        content: { 'application/json': { schema: { 'x-ts-type': User } } },
+        content: { 'application/json': { schema: { 'x-ts-type': User } } }
       },
     },
   })
-  async findById(@param.path.number('id') id: number): Promise<User> {
-    return await this.userRepository.findById(id);
+  async findById(
+    @param.path.number('id') id: number,
+    @param.header.string('Authorization') token: string
+  ): Promise<User> {
+    const jwt = require('jsonwebtoken');
+    return await jwt.verify(token, "9zAjr6A7rC", (err: any, decoded: any) => {
+      if (err) {
+        throw new HttpErrors.Forbidden;
+      } else {
+        return this.userRepository.findById(id);
+      }
+    });
+  }
+
+  @get('/users/unprotected/{id}', {
+    responses: {
+      '200': {
+        description: 'User model instance',
+        content: { 'application/json': { schema: { 'x-ts-type': User } } }
+      },
+    },
+  })
+  async findByIdUnprotected(
+    @param.path.number('id') id: number,
+  ): Promise<User> {
+    const complete: User = await this.userRepository.findById(id);
+    complete.messages = '';
+    complete.password = '';
+    complete.saved = '';
+    complete.birthday = '';
+    complete.bookings = '';
+    return complete;
   }
 
   @patch('/users/{id}', {
@@ -185,8 +217,9 @@ export class UserController {
     await this.userRepository.deleteById(id);
   }
 
-  getRandomInt(max: number): number {
-    return Math.floor(Math.random() * Math.floor(max));
+  generateJWT(userID: number): string {
+    const jwt = require('jsonwebtoken');
+    return jwt.sign({ "userID": userID }, "9zAjr6A7rC");
   }
 
 }

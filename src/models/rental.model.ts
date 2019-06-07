@@ -22,7 +22,6 @@ export class Rental extends Entity {
 
   @property({
     type: 'string',
-    required: true,
     mysql: {
       columnName: "picture_sources"
     }

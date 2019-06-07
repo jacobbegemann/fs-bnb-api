@@ -4,6 +4,8 @@ import {
   Filter,
   repository,
   Where,
+  WhereBuilder,
+  FilterBuilder,
 } from '@loopback/repository';
 import {
   post,
@@ -20,6 +22,9 @@ import { Rental, Trip } from '../models';
 import { RentalRepository, TripRepository } from '../repositories';
 
 export class RentalController {
+
+  private fileNo: number = 0;
+
   constructor(
     @repository(RentalRepository)
     public rentalRepository: RentalRepository,
@@ -38,6 +43,25 @@ export class RentalController {
   async addProperty(
     @requestBody() rental: Rental
   ): Promise<Rental> {
+    const arr = rental.pictureSources.split('@');
+    let fileSources = '';
+    const fs = require("fs");
+    for (let i = 0; i < arr.length; i++) {
+      let str = arr[i];
+      await new Promise((resolve, reject) => {
+        if (str) {
+          fs.writeFile(`data/images/imageFile${this.fileNo}.txt`, str, (err: any) => {
+            if (err) reject(err);
+            fileSources += `imageFile${this.fileNo}.txt@`;
+            this.fileNo++;
+            resolve();
+          });
+        } else {
+          resolve();
+        }
+      });
+    }
+    rental.pictureSources = fileSources;
     return await this.rentalRepository.create(rental);
   }
 
@@ -50,7 +74,62 @@ export class RentalController {
     },
   })
   async findById(@param.path.number('id') id: number): Promise<Rental> {
-    return await this.rentalRepository.findById(id);
+    const foundRental: Rental = await this.rentalRepository.findById(id);
+    const fileArr = foundRental.pictureSources.split('@');
+    const fs = require('fs');
+    let imageData = '';
+    for (let i = 0; i < fileArr.length; i++) {
+      const path = fileArr[i];
+      if (path.substr(0, 7) === 'http://' || path.substr(0, 8) === 'https://') {
+        imageData += `${path}@`;
+      } else if (path.substr(0, 9) === 'imageFile') {
+        await new Promise((resolve, reject) => {
+          fs.readFile(`data/images/${path}`, (err: any, data: any) => {
+            if (err) reject(err);
+            imageData += `${data.toString()}@`;
+            resolve();
+          });
+        });
+      }
+    }
+    foundRental.pictureSources = imageData;
+    return foundRental;
+  }
+
+  @get('/properties/byHost/{hostID}', {
+    responses: {
+      '200': {
+        description: 'Rental model instance',
+        content: { 'application/json': { schema: { 'x-ts-type': Rental } } },
+      },
+    },
+  })
+  async findByHostId(@param.path.number('hostID') hostID: number): Promise<Rental[]> {
+    const hostIdWhere: Where = (new WhereBuilder()).eq("hostID", hostID);
+    const filter: Filter<Rental> = (new FilterBuilder<Rental>()).where(hostIdWhere).build();
+    const foundRental: Rental[] = await this.rentalRepository.find(filter);
+    const fs = require("fs");
+    for (let i = 0; i < foundRental.length; i++) {
+      const value = foundRental[i];
+      const fileArr = value.pictureSources.split('@');
+      let imageData = '';
+      for (let j = 0; j < fileArr.length; j++) {
+        const path = fileArr[j];
+        if (path.substr(0, 7) === 'http://' || path.substr(0, 8) === 'https://') {
+          imageData += `${path}@`;
+        } else if (path.substr(0, 9) === 'imageFile') {
+          await new Promise((resolve, reject) => {
+            fs.readFile(`data/images/${path}`, (err: any, data: any) => {
+              if (err) reject(err);
+              imageData += `${data.toString()}@`;
+              resolve();
+            });
+          });
+        }
+      }
+      value.pictureSources = imageData;
+    }
+    return foundRental;
   }
 
   @del('/properties/{id}', {
@@ -107,7 +186,29 @@ export class RentalController {
   async find(
     @param.query.object('filter', getFilterSchemaFor(Rental)) filter?: Filter<Rental>,
   ): Promise<Rental[]> {
-    return await this.rentalRepository.find(filter);
+    const foundRental: Rental[] = await this.rentalRepository.find(filter);
+    const fs = require("fs");
+    for (let i = 0; i < foundRental.length; i++) {
+      const value = foundRental[i];
+      const fileArr = value.pictureSources.split('@');
+      let imageData = '';
+      for (let j = 0; j < fileArr.length; j++) {
+        const path = fileArr[j];
+        if (path.substr(0, 7) === 'http://' || path.substr(0, 8) === 'https://') {
+          imageData += `${path}@`;
+        } else if (path.substr(0, 9) === 'imageFile') {
+          await new Promise((resolve, reject) => {
+            fs.readFile(`data/images/${path}`, (err: any, data: any) => {
+              if (err) reject(err);
+              imageData += `${data.toString()}@`;
+              resolve();
+            });
+          });
+        }
+      }
+      value.pictureSources = imageData;
+    }
+    return foundRental;
   }
 
   @patch('/rentals', {
