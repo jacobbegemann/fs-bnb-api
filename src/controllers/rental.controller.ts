@@ -23,7 +23,7 @@ import { RentalRepository, TripRepository } from '../repositories';
 
 export class RentalController {
 
-  private fileNo: number = 0;
+  private fileNo: number;
 
   constructor(
     @repository(RentalRepository)
@@ -49,16 +49,18 @@ export class RentalController {
     for (let i = 0; i < arr.length; i++) {
       let str = arr[i];
       await new Promise((resolve, reject) => {
-        if (str) {
-          fs.writeFile(`data/images/imageFile${this.fileNo}.txt`, str, (err: any) => {
-            if (err) reject(err);
-            fileSources += `imageFile${this.fileNo}.txt@`;
-            this.fileNo++;
+        fs.readdir(`data/images`, (err: any, files: any) => {
+          if (err) throw err;
+          if (str) {
+            fs.writeFile(`data/images/imageFile${files.length + 1}.txt`, str, (err: any) => {
+              if (err) reject(err);
+              fileSources += `imageFile${files.length + 1}.txt@`;
+              resolve();
+            });
+          } else {
             resolve();
-          });
-        } else {
-          resolve();
-        }
+          }
+        });
       });
     }
     rental.pictureSources = fileSources;
@@ -226,7 +228,7 @@ export class RentalController {
     return await this.rentalRepository.updateAll(rental, where);
   }
 
-  @patch('/rentals/{id}', {
+  @patch('/properties/{id}', {
     responses: {
       '204': {
         description: 'Rental PATCH success',
@@ -237,7 +239,27 @@ export class RentalController {
     @param.path.number('id') id: number,
     @requestBody() rental: Rental,
   ): Promise<void> {
-    await this.rentalRepository.updateById(id, rental);
+    const arr = rental.pictureSources.split('@');
+    let fileSources = '';
+    const fs = require("fs");
+    for (let i = 0; i < arr.length; i++) {
+      let str = arr[i];
+      await new Promise((resolve, reject) => {
+        fs.readdir(`data/images`, (err: any, files: any) => {
+          if (str) {
+            fs.writeFile(`data/images/imageFile${files.length + 1}.txt`, str, (err: any) => {
+              if (err) reject(err);
+              fileSources += `imageFile${files.length + 1}.txt@`;
+              resolve();
+            });
+          } else {
+            resolve();
+          }
+        });
+      });
+    }
+    rental.pictureSources = fileSources;
+    return await this.rentalRepository.updateById(id, rental);
   }
 
   @put('/rentals/{id}', {
