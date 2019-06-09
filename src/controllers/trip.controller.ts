@@ -4,6 +4,7 @@ import {
   Filter,
   repository,
   Where,
+  FilterBuilder,
 } from '@loopback/repository';
 import {
   post,
@@ -16,13 +17,15 @@ import {
   del,
   requestBody,
 } from '@loopback/rest';
-import { Trip } from '../models';
-import { TripRepository } from '../repositories';
+import { Trip, Rental } from '../models';
+import { TripRepository, RentalRepository } from '../repositories';
 
 export class TripController {
   constructor(
     @repository(TripRepository)
     public tripRepository: TripRepository,
+    @repository(RentalRepository)
+    public rentalRepository: RentalRepository
   ) { }
 
   @post('/trips', {
@@ -94,6 +97,45 @@ export class TripController {
   })
   async findById(@param.path.number('id') id: number): Promise<Trip> {
     return await this.tripRepository.findById(id);
+  }
+
+  @get('/trips/byHost/{id}', {
+    responses: {
+      '200': {
+        description: 'Trip model instance',
+        content: { 'application/json': { schema: { 'x-ts-type': Trip } } },
+      },
+    },
+  })
+  async findByHostId(@param.path.number('id') id: number): Promise<Trip[]> {
+    const filter: Filter<Rental> = new FilterBuilder<Rental>().build();
+    filter.where = { hostID: id };
+    const foundRental: Rental[] = await this.rentalRepository.find(filter);
+    const trips: Trip[] = [];
+    for (let i = 0; i < foundRental.length; i++) {
+      const rental = foundRental[i];
+      const tripFilter: Filter<Trip> = new FilterBuilder<Trip>().build();
+      filter.where = { rentalID: rental.getId() };
+      const foundTrips: Trip[] = await this.tripRepository.find(tripFilter);
+      for (let j = 0; j < foundTrips.length; j++) {
+        if (foundTrips[j].rentalID == rental.getId()) trips.push(foundTrips[j]);
+      }
+    }
+    return trips;
+  }
+
+  @get('/trips/byUser/{id}', {
+    responses: {
+      '200': {
+        description: 'Trip model instance',
+        content: { 'application/json': { schema: { 'x-ts-type': Trip } } },
+      },
+    },
+  })
+  async findByUserId(@param.path.number('id') id: number): Promise<Trip[]> {
+    const filter: Filter<Trip> = (new FilterBuilder<Trip>()).build();
+    filter.where = { userID: id };
+    return await this.tripRepository.find(filter);
   }
 
   @patch('/trips/{id}', {
