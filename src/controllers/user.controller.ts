@@ -22,8 +22,6 @@ import {
 import { User } from '../models';
 import { UserRepository } from '../repositories';
 import bodyParser = require('body-parser');
-import { Utility } from '../utility';
-import { request } from 'http';
 
 export class UserController {
 
@@ -117,8 +115,7 @@ export class UserController {
   async find(
     @param.query.object('filter', getFilterSchemaFor(User)) filter?: Filter<User>,
   ): Promise<User[]> {
-    // return await this.userRepository.find(filter);
-    return [];
+    return await this.userRepository.find(filter);
   }
 
   @patch('/users', {

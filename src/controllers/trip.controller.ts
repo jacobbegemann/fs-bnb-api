@@ -110,10 +110,10 @@ export class TripController {
   async findByHostId(@param.path.number('id') id: number): Promise<Trip[]> {
     const filter: Filter<Rental> = new FilterBuilder<Rental>().build();
     filter.where = { hostID: id };
-    const foundRental: Rental[] = await this.rentalRepository.find(filter);
+    const foundRentals: Rental[] = await this.rentalRepository.find(filter);
     const trips: Trip[] = [];
-    for (let i = 0; i < foundRental.length; i++) {
-      const rental = foundRental[i];
+    for (let i = 0; i < foundRentals.length; i++) {
+      const rental = foundRentals[i];
       const tripFilter: Filter<Trip> = new FilterBuilder<Trip>().build();
       filter.where = { rentalID: rental.getId() };
       const foundTrips: Trip[] = await this.tripRepository.find(tripFilter);

@@ -23,8 +23,6 @@ import { RentalRepository, TripRepository } from '../repositories';
 
 export class RentalController {
 
-  private fileNo: number;
-
   constructor(
     @repository(RentalRepository)
     public rentalRepository: RentalRepository,

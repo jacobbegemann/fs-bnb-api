@@ -8,7 +8,7 @@ export class RentalRepository extends DefaultCrudRepository<
   typeof Rental.prototype.id
   > {
   constructor(
-    @inject('datasources.mysqldb') dataSource: MysqldbDataSource,
+    @inject('datasources.db') dataSource: DbDataSource,
   ) {
     super(Rental, dataSource);
   }
